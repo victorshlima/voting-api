@@ -1,4 +1,11 @@
 package com.challenge.voting_api.dto.response;
 
-public record AgendaResponse(Long id, String titulo) {
+import io.swagger.v3.oas.annotations.media.Schema;
+
+public record AgendaResponse(
+		@Schema(description = "Identificador da pauta", example = "1")
+		Long id,
+		@Schema(description = "Titulo da pauta", example = "Reforma do estatuto")
+		String titulo
+) {
 }

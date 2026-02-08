@@ -2,11 +2,18 @@ package com.challenge.voting_api.controller;
 
 import com.challenge.voting_api.dto.request.AgendaCreateRequest;
 import com.challenge.voting_api.dto.response.AgendaResponse;
-
 import com.challenge.voting_api.service.AgendaService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.headers.Header;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
-
 import lombok.extern.java.Log;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.MediaType;
@@ -19,6 +26,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
 @RequestMapping(path = "/agendas", headers = "X-API-Version=1")
+@Tag(name = "Agendas", description = "Operacoes para gerenciar pautas")
 @Log4j2
 public class AgendaController {
 
@@ -29,6 +37,34 @@ public class AgendaController {
 	}
 
 	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Operation(
+			summary = "Criar pauta",
+			description = "Cria uma nova pauta para votacao.",
+			parameters = {
+					@Parameter(
+							name = "X-API-Version",
+							in = ParameterIn.HEADER,
+							required = true,
+							description = "Versao da API",
+							schema = @Schema(type = "string"),
+							example = "1"
+					)
+			}
+	)
+	@ApiResponses({
+			@ApiResponse(
+					responseCode = "201",
+					description = "Pauta criada",
+					headers = {
+							@Header(name = "Location", description = "URI do recurso criado")
+					},
+					content = @Content(
+							mediaType = MediaType.APPLICATION_JSON_VALUE,
+							schema = @Schema(implementation = AgendaResponse.class)
+					)
+			),
+			@ApiResponse(responseCode = "400", description = "Dados invalidos")
+	})
 	public ResponseEntity<AgendaResponse> create(final @Valid @RequestBody AgendaCreateRequest agendaCreateRequest) {
 		log.info("Creating agenda with title: {}", agendaCreateRequest.title());
 		AgendaResponse response = agendaService.createAgenda(agendaCreateRequest);
