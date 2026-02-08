@@ -37,3 +37,7 @@ spring:
   flyway:
     enabled: true
     locations: classpath:db/migration
+
+voting-session:
+  default-duration-minutes: 1
+  max-duration-minutes: 60
