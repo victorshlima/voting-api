@@ -28,7 +28,7 @@ public class Agenda {
 	@Column(name = "created_at", nullable = false, updatable = false, insertable = false)
 	private OffsetDateTime createdAt;
 
-	protected Agenda() {
+	public Agenda() {
 	}
 
 	public Agenda(String title) {
