@@ -1,8 +1,8 @@
 package com.challenge.voting_api.controller;
 
-import com.challenge.voting_api.dto.request.VotingSessionCreateRequest;
-import com.challenge.voting_api.dto.response.VotingSessionResponse;
-import com.challenge.voting_api.service.VotingSessionService;
+import com.challenge.voting_api.dto.request.VoteCreateRequest;
+import com.challenge.voting_api.dto.response.VoteResponse;
+import com.challenge.voting_api.service.VoteService;
 import com.challenge.voting_api.util.LocationUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -17,26 +17,27 @@ import jakarta.validation.Valid;
 import java.net.URI;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(path = "/voting-sessions", headers = "X-API-Version=1")
-@Tag(name = "Voting Sessions", description = "Operacoes para gerenciar sessoes de votacao")
-public class VotingSessionController {
+@RequestMapping(path = "/voting-sessions/{votingSessionId}/votes", headers = "X-API-Version=1")
+@Tag(name = "Votes", description = "Operacoes para registrar votos em sessoes abertas")
+public class VoteController {
 
-	private final VotingSessionService votingSessionService;
+	private final VoteService voteService;
 
-	public VotingSessionController(VotingSessionService votingSessionService) {
-		this.votingSessionService = votingSessionService;
+	public VoteController(final VoteService voteService) {
+		this.voteService = voteService;
 	}
 
 	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Operation(
-			summary = "Criar sessao de votacao",
-			description = "Abre uma sessao de votacao para uma pauta por um periodo de minutos.",
+			summary = "Registrar voto",
+			description = "Registra o voto de um associado em uma sessao aberta.",
 			parameters = {
 					@Parameter(
 							name = "X-API-Version",
@@ -51,22 +52,25 @@ public class VotingSessionController {
 	@ApiResponses({
 			@ApiResponse(
 					responseCode = "201",
-					description = "Sessao criada",
+					description = "Voto registrado",
 					headers = {
 							@Header(name = "Location", description = "URI do recurso criado")
 					},
 					content = @Content(
 							mediaType = MediaType.APPLICATION_JSON_VALUE,
-							schema = @Schema(implementation = VotingSessionResponse.class)
+							schema = @Schema(implementation = VoteResponse.class)
 					)
 			),
 			@ApiResponse(responseCode = "400", description = "Dados invalidos"),
-			@ApiResponse(responseCode = "404", description = "Pauta nao encontrada"),
-			@ApiResponse(responseCode = "409", description = "Sessao ja existe para a pauta")
+			@ApiResponse(responseCode = "404", description = "Sessao nao encontrada"),
+			@ApiResponse(responseCode = "409", description = "Sessao encerrada ou voto duplicado")
 	})
-	public ResponseEntity<VotingSessionResponse> create(
-			final @Valid @RequestBody VotingSessionCreateRequest request) {
-		VotingSessionResponse response = votingSessionService.create(request);
+	public ResponseEntity<VoteResponse> create(
+			@Parameter(description = "Identificador da sessao de votacao", example = "1")
+			@PathVariable final Long votingSessionId,
+			final @Valid @RequestBody VoteCreateRequest request
+	) {
+		VoteResponse response = voteService.create(votingSessionId, request);
 		URI location = LocationUtils.fromCurrentRequestWithId(response.id());
 		return ResponseEntity.created(location).body(response);
 	}
