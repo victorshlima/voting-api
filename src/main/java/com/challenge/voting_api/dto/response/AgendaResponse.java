@@ -4,8 +4,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 public record AgendaResponse(
 		@Schema(description = "Identificador da pauta", example = "1")
-		Long id,
+		Long agendaId,
 		@Schema(description = "Titulo da pauta", example = "Reforma do estatuto")
-		String titulo
+		String title
 ) {
 }

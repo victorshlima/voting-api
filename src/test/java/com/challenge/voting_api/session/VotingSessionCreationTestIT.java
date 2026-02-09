@@ -45,7 +45,7 @@ class VotingSessionCreationTestIT {
 	void shouldCreateVotingSessionWithDefaultDuration() throws Exception {
 		Agenda agenda = agendaRepository.save(new Agenda("Pauta default"));
 
-		MvcResult result = mockMvc.perform(post("/voting-sessions")
+		MvcResult result = mockMvc.perform(post("/voting-sessions/" + agenda.getId())
 						.header(API_VERSION_HEADER, "1")
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(jsonBody(Map.of("agendaId", agenda.getId()))))
@@ -66,7 +66,7 @@ class VotingSessionCreationTestIT {
 	void shouldCreateVotingSessionWithCustomDuration() throws Exception {
 		Agenda agenda = agendaRepository.save(new Agenda("Pauta custom"));
 
-		MvcResult result = mockMvc.perform(post("/voting-sessions")
+		MvcResult result = mockMvc.perform(post("/voting-sessions/" + agenda.getId())
 						.header(API_VERSION_HEADER, "1")
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(jsonBody(Map.of(
@@ -87,7 +87,7 @@ class VotingSessionCreationTestIT {
 	void shouldRejectDurationAboveMax() throws Exception {
 		Agenda agenda = agendaRepository.save(new Agenda("Pauta max"));
 
-		mockMvc.perform(post("/voting-sessions")
+		mockMvc.perform(post("/voting-sessions/" + agenda.getId())
 						.header(API_VERSION_HEADER, "1")
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(jsonBody(Map.of(
@@ -99,7 +99,7 @@ class VotingSessionCreationTestIT {
 
 	@Test
 	void shouldReturnNotFoundWhenAgendaMissing() throws Exception {
-		mockMvc.perform(post("/voting-sessions")
+		mockMvc.perform(post("/voting-sessions/9999999")
 						.header(API_VERSION_HEADER, "1")
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(jsonBody(Map.of("agendaId", 9999))))
@@ -114,13 +114,13 @@ class VotingSessionCreationTestIT {
 				"durationMinutes", 5
 		));
 
-		mockMvc.perform(post("/voting-sessions")
+		mockMvc.perform(post("/voting-sessions/" + agenda.getId())
 						.header(API_VERSION_HEADER, "1")
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(payload))
 				.andExpect(status().isCreated());
 
-		mockMvc.perform(post("/voting-sessions")
+		mockMvc.perform(post("/voting-sessions/"+ agenda.getId())
 						.header(API_VERSION_HEADER, "1")
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(payload))

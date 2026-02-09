@@ -38,31 +38,37 @@ public class VoteServiceImpl implements VoteService {
 	public VoteResponse create(final Long votingSessionId, final VoteCreateRequest request) {
 		try {
 			final VotingSession session = votingSessionRepository.findById(votingSessionId)
-					.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Voting session not found"));
+					.orElseThrow(() -> new ResponseStatusException(
+							HttpStatus.NOT_FOUND,
+							"Voting session not found"
+					));
 			validateSessionOpen(session);
-			if (voteRepository.existsByVotingSessionIdAndAssociateId(session.getId(), request.associateId())) {
-				throw new ResponseStatusException(HttpStatus.CONFLICT, "Associate already voted in this session");
+			if (voteRepository.existsByVotingSessionIdAndAssociateId(
+					session.getId(),
+					request.associateId()
+			)) {
+				throw new ResponseStatusException(
+						HttpStatus.CONFLICT,
+						"Associate already voted in this session"
+				);
 			}
-			Vote saved = voteRepository.save(new Vote(session, request.associateId(), request.vote().toBoolean()));
+			Vote saved = voteRepository.save(
+					new Vote(session, request.associateId(), request.vote().toBoolean())
+			);
 			return new VoteResponse(
 					saved.getId(),
 					session.getId(),
 					request.associateId(),
-					VoteChoice.fromBoolean(saved.isVote())
-			);
+					VoteChoice.fromBoolean(saved.isVote()));
 		} catch (ResponseStatusException | DataIntegrityViolationException exception) {
-			log.error(
-					"VoteServiceImpl#create - Error in voting process - associateId={}",
+			log.error("VoteServiceImpl#create - Error in voting process - associateId={}",
 					request.associateId(),
-					exception
-			);
+					exception);
 			throw exception;
 		} catch (Exception exception) {
-			log.error(
-					"VoteServiceImpl#create - Error in voting process - associateId={}",
+			log.error("VoteServiceImpl#create - Error in voting process - associateId={}",
 					request.associateId(),
-					exception
-			);
+					exception);
 			throw new GenericAgendaException(exception.getMessage());
 		}
 	}

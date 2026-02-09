@@ -41,7 +41,7 @@ class AgendaControllerTestIT {
 				.andExpect(status().isCreated())
 				.andExpect(header().exists("Location"))
 				.andExpect(jsonPath("$.id").isNumber())
-				.andExpect(jsonPath("$.titulo").value("Pauta de Teste"));
+				.andExpect(jsonPath("$.title").value("Pauta de Teste"));
 	}
 
 	@Test
@@ -59,7 +59,7 @@ class AgendaControllerTestIT {
 	void shouldReturn400WhenTitleIsGreaterThan500Chars() throws Exception {
 		String titleWith501Chars = "A".repeat(501);
 		var request = Map.of(
-				"titulo", titleWith501Chars
+				"title", titleWith501Chars
 		);
 		mockMvc.perform(post("/agendas")
 						.header(API_VERSION_HEADER, "1")

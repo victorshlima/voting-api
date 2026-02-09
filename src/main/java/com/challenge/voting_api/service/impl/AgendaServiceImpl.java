@@ -22,9 +22,10 @@ public class AgendaServiceImpl implements AgendaService {
 	@Override
 	@Transactional
 	public AgendaResponse createAgenda(AgendaCreateRequest request) {
+		log.info("AgendaServiceImpl#createAgenda Creating Agenda  title={}", request.title());
 		Agenda saved = agendaRepository.save(
 				new Agenda(request.title()));
-		log.info("Agenda Created id={} title={}", saved.getId(), saved.getTitle());
+		log.info("AgendaServiceImpl#createAgenda  Agenda Created sessionId={} title={}", saved.getId(), saved.getTitle());
 		return new AgendaResponse(saved.getId(), saved.getTitle());
 	}
 }

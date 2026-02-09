@@ -45,3 +45,26 @@ voting-session:
 voting-result:
   approval-threshold-percent: 50
   scheduler-interval: 1m
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,grafana
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: never
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+
+logging:
+  level:
+    root: INFO
+    com.zaxxer.hikari: INFO
+    org.hibernate.SQL: WARN
+    org.hibernate.type.descriptor.sql: WARN

@@ -17,13 +17,10 @@ import jakarta.validation.Valid;
 import java.net.URI;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(path = "/voting-sessions", headers = "X-API-Version=1")
+@RequestMapping(path = "/voting-sessions/{votingSessionId}", headers = "X-API-Version=1")
 @Tag(name = "Voting Sessions", description = "Operacoes para gerenciar sessoes de votacao")
 public class VotingSessionController {
 
@@ -33,7 +30,10 @@ public class VotingSessionController {
 		this.votingSessionService = votingSessionService;
 	}
 
-	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(
+			consumes = MediaType.APPLICATION_JSON_VALUE,
+			produces = MediaType.APPLICATION_JSON_VALUE
+	)
 	@Operation(
 			summary = "Criar sessao de votacao",
 			description = "Abre uma sessao de votacao para uma pauta por um periodo de minutos.",
@@ -65,9 +65,10 @@ public class VotingSessionController {
 			@ApiResponse(responseCode = "409", description = "Sessao ja existe para a pauta")
 	})
 	public ResponseEntity<VotingSessionResponse> create(
-			final @Valid @RequestBody VotingSessionCreateRequest request) {
-		VotingSessionResponse response = votingSessionService.create(request);
-		URI location = LocationUtils.fromCurrentRequestWithId(response.id());
+            final @Valid @RequestBody VotingSessionCreateRequest request,
+			@PathVariable final Long votingSessionId) {
+		VotingSessionResponse response = votingSessionService.create(votingSessionId, request);
+		URI location = LocationUtils.fromCurrentRequestWithId(response.sessionId());
 		return ResponseEntity.created(location).body(response);
 	}
 }

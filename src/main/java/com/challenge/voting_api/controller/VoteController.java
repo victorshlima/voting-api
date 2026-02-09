@@ -24,7 +24,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(path = "/voting-sessions/{votingSessionId}/votes", headers = "X-API-Version=1")
+@RequestMapping(path = "/voting-sessions/{votingSessionId}/votes",
+		headers = "X-API-Version=1")
 @Tag(name = "Votes", description = "Operacoes para registrar votos em sessoes abertas")
 public class VoteController {
 
@@ -34,7 +35,8 @@ public class VoteController {
 		this.voteService = voteService;
 	}
 
-	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE,
+			produces = MediaType.APPLICATION_JSON_VALUE)
 	@Operation(
 			summary = "Registrar voto",
 			description = "Registra o voto de um associado em uma sessao aberta.",

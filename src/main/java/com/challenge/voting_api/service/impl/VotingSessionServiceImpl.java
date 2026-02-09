@@ -10,8 +10,6 @@ import com.challenge.voting_api.repository.VotingSessionRepository;
 import com.challenge.voting_api.service.VotingSessionService;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-
-import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -38,21 +36,35 @@ public class VotingSessionServiceImpl implements VotingSessionService {
 
 	@Override
 	@Transactional
-	public VotingSessionResponse create(final VotingSessionCreateRequest request) {
-		final Agenda agenda = getAgendaIfIdValid(request);
+	public VotingSessionResponse create(final Long agendaId, final VotingSessionCreateRequest request) {
+		final Agenda agenda = getAgendaIfIdValid(agendaId);
 		final int durationMinutes = resolveDurationMinutes(request.durationMinutes());
 		final OffsetDateTime startsAt = OffsetDateTime.now(ZoneOffset.UTC);
 		final OffsetDateTime endsAt = OffsetDateTime.now(ZoneOffset.UTC).plusMinutes(durationMinutes);
-		final VotingSession saved = votingSessionRepository.save(new VotingSession(agenda, startsAt, endsAt));
-		log.info("Voting session created id={} agendaId={} startsAt={}", saved.getId(), agenda.getId(), startsAt);
-		return new VotingSessionResponse(saved.getId(), agenda.getId(), saved.getStartsAt(), saved.getEndsAt());
+		final VotingSession saved = votingSessionRepository.save(
+				new VotingSession(agenda, startsAt, endsAt)
+		);
+		log.info(
+				"Voting session created sessionId={} agendaId={} startsAt={}",
+				saved.getId(),
+				agenda.getId(),
+				startsAt
+		);
+		return new VotingSessionResponse(
+				saved.getId(),
+				saved.getStartsAt(),
+				saved.getEndsAt()
+		);
 	}
 
-	private Agenda getAgendaIfIdValid(final VotingSessionCreateRequest request) {
-		final Agenda agenda = agendaRepository.findById(request.agendaId())
+	private Agenda getAgendaIfIdValid(final Long agendaId) {
+		final Agenda agenda = agendaRepository.findById(agendaId)
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Agenda not found"));
 		if (votingSessionRepository.existsByAgendaId(agenda.getId())) {
-			throw new ResponseStatusException(HttpStatus.CONFLICT, "Voting session already exists for agenda");
+			throw new ResponseStatusException(
+					HttpStatus.CONFLICT,
+					"Voting session already exists for agenda"
+			);
 		}
 		return agenda;
 	}
