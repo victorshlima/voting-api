@@ -54,4 +54,9 @@ public class Agenda {
 	public OffsetDateTime getCreatedAt() {
 		return createdAt;
 	}
+
+	public void updateResult(final String result, final OffsetDateTime resultCreatedAt) {
+		this.result = result;
+		this.resultCreatedAt = resultCreatedAt;
+	}
 }
