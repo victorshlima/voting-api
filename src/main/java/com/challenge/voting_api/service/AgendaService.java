@@ -6,6 +6,4 @@ import com.challenge.voting_api.dto.response.AgendaResponse;
 public interface AgendaService {
 
 	AgendaResponse createAgenda(AgendaCreateRequest request);
-
-	void deleteAgenda(Long agendaId);
 }

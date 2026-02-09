@@ -2,18 +2,18 @@ package com.challenge.voting_api.controller;
 
 import com.challenge.voting_api.dto.request.AgendaCreateRequest;
 import com.challenge.voting_api.dto.response.AgendaResponse;
+import com.challenge.voting_api.entity.Agenda;
+import com.challenge.voting_api.repository.AgendaRepository;
 import com.challenge.voting_api.service.AgendaService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
-import lombok.extern.log4j.Log4j2;
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,13 +22,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(path = "/agendas", headers = "X-API-Version=1")
 @Tag(name = "Agendas", description = "Operacoes para gerenciar pautas")
-@Log4j2
 public class AgendaController {
 
     private final AgendaService agendaService;
+    private final AgendaRepository agendaRepository;
 
-    public AgendaController(final AgendaService agendaService) {
+    public AgendaController(final AgendaService agendaService, final AgendaRepository agendaRepository) {
         this.agendaService = agendaService;
+        this.agendaRepository = agendaRepository;
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE,
@@ -39,22 +40,16 @@ public class AgendaController {
     )
     public ResponseEntity<AgendaResponse> create(
             final @Valid @RequestBody AgendaCreateRequest agendaCreateRequest) {
-        log.info("Creating agenda with title: {}", agendaCreateRequest.title());
         AgendaResponse response = agendaService.createAgenda(agendaCreateRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @DeleteMapping(path = "/{agendaId}")
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(
-            summary = "Excluir pauta",
-            description = "Remove uma pauta que ainda nao foi iniciada."
+            summary = "Listar pautas",
+            description = "Endpoint simples para visualizar todas as pautas com todos os campos (teste)."
     )
-    public ResponseEntity<Void> delete(
-            @Parameter(description = "ID da pauta", example = "1")
-            @PathVariable final Long agendaId
-    ) {
-        log.info("Deleting agenda id={}", agendaId);
-        agendaService.deleteAgenda(agendaId);
-        return ResponseEntity.noContent().build();
+    public List<Agenda> list() {
+        return agendaRepository.findAll();
     }
 }
