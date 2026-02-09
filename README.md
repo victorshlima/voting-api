@@ -5,10 +5,8 @@ API para votacao de pautas. Fluxo basico: criar pauta -> abrir sessao da pauta -
 ## Requisitos
 Para executar o projeto localmente, é necessário ter os seguintes itens instalados:
 
-# Java
- - version 25
+**Docker**
 
-# Docker
 Ferramenta para criação e execução de containers.
 Documentação oficial (Linux):
 https://docs.docker.com/engine/install/
