@@ -53,7 +53,10 @@ class VoteCreationTestIT {
 								"vote", "SIM"
 						))))
 				.andExpect(status().isCreated())
-				.andExpect(header().exists("Location"));
+				.andExpect(header().doesNotExist("Location"))
+				.andExpect(jsonPath("$.agendaId").value(session.getAgenda().getId().intValue()))
+				.andExpect(jsonPath("$.votingSessionId").value(session.getId().intValue()))
+				.andExpect(jsonPath("$.id").doesNotExist());
 	}
 
 	@Test

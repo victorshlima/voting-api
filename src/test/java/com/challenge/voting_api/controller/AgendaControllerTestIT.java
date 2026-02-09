@@ -1,7 +1,6 @@
 package com.challenge.voting_api.controller;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -39,7 +38,9 @@ class AgendaControllerTestIT {
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(request)))
 				.andExpect(status().isCreated())
-				.andExpect(header().exists("Location"));
+				.andExpect(jsonPath("$.agendaId").isNumber())
+				.andExpect(jsonPath("$.title").value("Pauta de Teste"))
+				.andExpect(jsonPath("$.id").doesNotExist());
 	}
 
 	@Test

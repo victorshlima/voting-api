@@ -2,10 +2,10 @@ package com.challenge.voting_api.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-public record VoteResponse(
-		@Schema(description = "Agenda ID", example = "1")
-		Long agendaId,
+public record VotingSessionOpenResponse(
 		@Schema(description = "Voting session ID", example = "1")
-		Long votingSessionId
+		Long sessionId,
+		@Schema(description = "Agenda title", example = "Reforma do estatuto")
+		String agendaTitle
 ) {
 }

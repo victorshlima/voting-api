@@ -39,26 +39,37 @@ public class VotingResultServiceImpl implements VotingResultService {
 	@Override
 	@Transactional
 	public void processClosedSessions() {
-		final OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
-		final List<VotingSession> sessions = votingSessionRepository.findClosedSessionsWithoutResult(now);
-		for (VotingSession session : sessions) {
-			final Agenda agenda = session.getAgenda();
-			if (agenda.getResult() != null) {
-				continue;
+
+			final OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
+			final List<VotingSession> sessions = votingSessionRepository.findClosedSessionsWithoutResult(now);
+			if (sessions.isEmpty()) {
+				log.info("No closed sessions found to compute result");
+				return;
 			}
-			final long yesVotes = voteRepository.countByVotingSessionIdAndVoteTrue(session.getId());
-			final long noVotes = voteRepository.countByVotingSessionIdAndVoteFalse(session.getId());
-			final VotingResultStatus status = votingResultRule.decide(yesVotes, noVotes);
-			final String result = formatResult(agenda, session, status, yesVotes, noVotes);
-			agenda.updateResult(result, now);
-			agendaRepository.save(agenda);
-			log.info(
-					"Voting result computed agendaId={} sessionId={} status={}",
-					agenda.getId(),
-					session.getId(),
-					status
-			);
-		}
+
+			for (VotingSession session : sessions) {
+				log.info("Computing agenda result sessionId={} status={}", session.getId());
+				try {
+				final Agenda agenda = session.getAgenda();
+				if (agenda.getResult() != null) {
+					continue;
+				}
+				final VoteRepository.VoteCounts voteCounts = voteRepository.countVotesBySessionId(session.getId());
+				final long yesVotes = voteCounts.getYesVotes();
+				final long noVotes = voteCounts.getNoVotes();
+				final VotingResultStatus status = votingResultRule.decide(yesVotes, noVotes);
+				final String result = formatResult(agenda, session, status, yesVotes, noVotes);
+				agenda.updateResult(result, now);
+				agendaRepository.save(agenda);
+				log.info("Agenda result computed agendaId={} sessionId={} status={}",
+						agenda.getId(),
+						session.getId(),
+						status);
+				} catch (Exception exception) {
+					log.error("Error on generation agenda result - sessionId={} ex={}", session.getId(), exception);
+					throw exception;
+				}
+			}
 	}
 
 	private String formatResult(

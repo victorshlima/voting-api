@@ -2,6 +2,7 @@ package com.challenge.voting_api.service.impl;
 
 import com.challenge.voting_api.config.VotingSessionProperties;
 import com.challenge.voting_api.dto.request.VotingSessionCreateRequest;
+import com.challenge.voting_api.dto.response.VotingSessionOpenResponse;
 import com.challenge.voting_api.dto.response.VotingSessionResponse;
 import com.challenge.voting_api.entity.Agenda;
 import com.challenge.voting_api.entity.VotingSession;
@@ -10,6 +11,7 @@ import com.challenge.voting_api.repository.VotingSessionRepository;
 import com.challenge.voting_api.service.VotingSessionService;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.List;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -38,24 +40,36 @@ public class VotingSessionServiceImpl implements VotingSessionService {
 	@Transactional
 	public VotingSessionResponse create(final Long agendaId, final VotingSessionCreateRequest request) {
 		log.info("Creating voting Session -  agendaId={}", agendaId);
-		final Agenda agenda = getAgendaIfIdValid(agendaId);
-		final int durationMinutes = resolveDurationMinutes(request.durationMinutes());
-		final OffsetDateTime startsAt = OffsetDateTime.now(ZoneOffset.UTC);
-		final OffsetDateTime endsAt = OffsetDateTime.now(ZoneOffset.UTC).plusMinutes(durationMinutes);
-		final VotingSession saved = votingSessionRepository.save(
-				new VotingSession(agenda, startsAt, endsAt)
-		);
-		log.info(
-				"Voting session created sessionId={} agendaId={} startsAt={}",
-				saved.getId(),
-				agenda.getId(),
-				startsAt
-		);
-		return new VotingSessionResponse(
-				saved.getId(),
-				saved.getStartsAt(),
-				saved.getEndsAt()
-		);
+		try {
+			final Agenda agenda = getAgendaIfIdValid(agendaId);
+			final int durationMinutes = resolveDurationMinutes(request.durationMinutes());
+			final OffsetDateTime startsAt = OffsetDateTime.now(ZoneOffset.UTC);
+			final OffsetDateTime endsAt = OffsetDateTime.now(ZoneOffset.UTC).plusMinutes(durationMinutes);
+			final VotingSession saved = votingSessionRepository.save(
+					new VotingSession(agenda, startsAt, endsAt)
+			);
+			log.info("Voting session created sessionId={} agendaId={}", saved.getId(), agenda.getId());
+			return new VotingSessionResponse(
+					saved.getId(),
+					saved.getStartsAt(),
+					saved.getEndsAt()
+			);
+		} catch (Exception exception) {
+			log.error("Error creating session - agendaId={} ex={}", agendaId, exception);
+			throw exception;
+		}
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<VotingSessionOpenResponse> listOpenSessions() {
+		OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
+		return votingSessionRepository.findOpenSessions(now).stream()
+				.map(session -> new VotingSessionOpenResponse(
+						session.getId(),
+						session.getAgenda().getTitle()
+				))
+				.toList();
 	}
 
 	private Agenda getAgendaIfIdValid(final Long agendaId) {

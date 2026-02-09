@@ -20,4 +20,13 @@ public interface VotingSessionRepository extends JpaRepository<VotingSession, Lo
 	List<VotingSession> findClosedSessionsWithoutResult(
 			@Param("time") OffsetDateTime time
 	);
+
+	@Query("""
+			select s from VotingSession s
+			join fetch s.agenda a
+			where s.startsAt <= :time
+			  and s.endsAt > :time
+			order by s.id
+			""")
+	List<VotingSession> findOpenSessions(@Param("time") OffsetDateTime time);
 }

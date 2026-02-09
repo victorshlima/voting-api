@@ -6,9 +6,11 @@ import jakarta.validation.constraints.Size;
 
 public record AgendaCreateRequest(
 		@NotBlank
+		@Size(min = TITLE_MIN_LENGTH)
 		@Size(max = TITLE_MAX_LENGTH)
 		@Schema(description = "Titulo da pauta", example = "Reforma do estatuto")
 		String title
 ) {
+	private static final int TITLE_MIN_LENGTH = 5 ;
 	private static final int TITLE_MAX_LENGTH = 500;
 }

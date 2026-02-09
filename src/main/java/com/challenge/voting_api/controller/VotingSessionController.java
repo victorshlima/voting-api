@@ -1,18 +1,19 @@
 package com.challenge.voting_api.controller;
 
 import com.challenge.voting_api.dto.request.VotingSessionCreateRequest;
+import com.challenge.voting_api.dto.response.VotingSessionOpenResponse;
 import com.challenge.voting_api.dto.response.VotingSessionResponse;
 import com.challenge.voting_api.service.VotingSessionService;
 import com.challenge.voting_api.util.LocationUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
+import java.util.List;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 
 @RestController
-@RequestMapping(path = "/voting-sessions/{agendaId}", headers = "X-API-Version=1")
+@RequestMapping(path = "/voting-sessions", headers = "X-API-Version=1")
 @Tag(name = "Voting Sessions", description = "Operacoes para gerenciar sessoes de votacao")
 public class VotingSessionController {
 
@@ -32,22 +33,13 @@ public class VotingSessionController {
 	}
 
 	@PostMapping(
+			path = "/{agendaId}",
 			consumes = MediaType.APPLICATION_JSON_VALUE,
 			produces = MediaType.APPLICATION_JSON_VALUE
 	)
 	@Operation(
 			summary = "Criar sessao de votacao",
-			description = "Abre uma sessao de votacao para uma pauta por um periodo de minutos.",
-			parameters = {
-					@Parameter(
-							name = "X-API-Version",
-							in = ParameterIn.HEADER,
-							required = true,
-							description = "Versao da API",
-							schema = @Schema(type = "string"),
-							example = "1"
-					)
-			}
+			description = "Abre uma sessao de votacao para uma pauta por um periodo de minutos."
 	)
 	public ResponseEntity<VotingSessionResponse> create(
             final @Valid @RequestBody VotingSessionCreateRequest request,
@@ -55,6 +47,11 @@ public class VotingSessionController {
 			@PathVariable final Long agendaId) {
 		VotingSessionResponse response = votingSessionService.create(agendaId, request);
 		URI location = LocationUtils.fromContextPathWithPath("/voting-sessions/{id}", response.sessionId());
-		return ResponseEntity.created(location).build();
+		return ResponseEntity.created(location).body(response);
+	}
+
+	@GetMapping(path = "/open")
+	public ResponseEntity<List<VotingSessionOpenResponse>> listOpenSessions() {
+		return ResponseEntity.ok(votingSessionService.listOpenSessions());
 	}
 }

@@ -1,6 +1,5 @@
 package com.challenge.voting_api.service.impl;
 
-import com.challenge.voting_api.dto.VoteChoice;
 import com.challenge.voting_api.dto.request.VoteCreateRequest;
 import com.challenge.voting_api.dto.response.VoteResponse;
 import com.challenge.voting_api.entity.Vote;
@@ -52,24 +51,17 @@ public class VoteServiceImpl implements VoteService {
 						"Associate already voted in this session"
 				);
 			}
-			Vote saved = voteRepository.save(
+			voteRepository.save(
 					new Vote(session, request.associateId(), request.vote().toBoolean())
 			);
 			return new VoteResponse(
-					saved.getId(),
-					session.getId(),
-					request.associateId(),
-					VoteChoice.fromBoolean(saved.isVote()));
-		} catch (ResponseStatusException | DataIntegrityViolationException exception) {
-			log.error("VoteServiceImpl#create - Error in voting process - associateId={}",
+					session.getAgenda().getId(),
+					session.getId());
+		} catch (Exception exception) {
+			log.error("Error when member votes - associateId={} ex={}",
 					request.associateId(),
 					exception);
 			throw exception;
-		} catch (Exception exception) {
-			log.error("VoteServiceImpl#create - Error in voting process - associateId={}",
-					request.associateId(),
-					exception);
-			throw new GenericAgendaException(exception.getMessage());
 		}
 	}
 
