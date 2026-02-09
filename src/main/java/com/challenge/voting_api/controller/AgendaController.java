@@ -7,11 +7,7 @@ import com.challenge.voting_api.util.LocationUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.headers.Header;
-import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
@@ -22,7 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -54,23 +49,12 @@ public class AgendaController {
                             example = "1")
             }
     )
-    @ApiResponses({
-            @ApiResponse(
-                    responseCode = "201",
-                    description = "Pauta criada",
-                    headers = {
-                            @Header(name = "Location", description = "URI do recurso criado")
-                    },
-                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = AgendaResponse.class))),
-            @ApiResponse(responseCode = "400", description = "Dados invalidos")
-    })
     public ResponseEntity<AgendaResponse> create(
             final @Valid @RequestBody AgendaCreateRequest agendaCreateRequest) {
         log.info("Creating agenda with title: {}", agendaCreateRequest.title());
         AgendaResponse response = agendaService.createAgenda(agendaCreateRequest);
         URI location = LocationUtils.fromCurrentRequestWithId(response.agendaId());
-        return ResponseEntity.created(location).body(response);
+        return ResponseEntity.created(location).build();
     }
 
     @DeleteMapping(path = "/{agendaId}")
@@ -87,13 +71,8 @@ public class AgendaController {
                             example = "1")
             }
     )
-    @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Pauta removida"),
-            @ApiResponse(responseCode = "404", description = "Pauta nao encontrada"),
-            @ApiResponse(responseCode = "409", description = "Pauta ja iniciada")
-    })
     public ResponseEntity<Void> delete(
-            @Parameter(description = "Identificador da pauta", example = "1")
+            @Parameter(description = "ID da pauta", example = "1")
             @PathVariable final Long agendaId
     ) {
         log.info("Deleting agenda id={}", agendaId);

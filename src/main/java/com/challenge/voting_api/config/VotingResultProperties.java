@@ -10,10 +10,12 @@ import org.springframework.validation.annotation.Validated;
 @ConfigurationProperties(prefix = "voting-result")
 @Validated
 public record VotingResultProperties(
-		@Min(0)
-		@Max(100)
+		@Min(MIN_APPROVAL_PERCENT)
+		@Max(MAX_APPROVAL_PERCENT)
 		int approvalThresholdPercent,
 		@NotNull
 		Duration schedulerInterval
 ) {
+	public static final int MIN_APPROVAL_PERCENT = 0;
+	public static final int MAX_APPROVAL_PERCENT = 100;
 }

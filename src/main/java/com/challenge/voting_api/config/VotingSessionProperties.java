@@ -7,8 +7,9 @@ import org.springframework.validation.annotation.Validated;
 @ConfigurationProperties(prefix = "voting-session")
 @Validated
 public record VotingSessionProperties(
-		@Min(1)
+		@Min(MIN_DURATION_MINUTES)
 		int defaultDurationMinutes,
 		int maxDurationMinutes
 ) {
+	public static final int MIN_DURATION_MINUTES = 1;
 }

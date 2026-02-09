@@ -20,6 +20,7 @@ import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import org.springframework.web.util.HtmlUtils;
 
 @RestControllerAdvice
 @Log4j2
@@ -135,10 +136,10 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 				OffsetDateTime.now(ZoneOffset.UTC).toString(),
 				status.value(),
 				error,
-				message,
-				path,
-				apiVersion,
-				errors
+				sanitize(message),
+				sanitize(path),
+				sanitize(apiVersion),
+				sanitizeErrors(errors)
 		);
 	}
 
@@ -173,5 +174,21 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 			return httpStatus.is5xxServerError() ? "Unexpected error" : httpStatus.getReasonPhrase();
 		}
 		return "Request failed";
+	}
+
+	private String sanitize(String value) {
+		if (value == null) {
+			return null;
+		}
+		return HtmlUtils.htmlEscape(value);
+	}
+
+	private List<ApiErrorDetail> sanitizeErrors(List<ApiErrorDetail> errors) {
+		return errors.stream()
+				.map(error -> new ApiErrorDetail(
+						sanitize(error.field()),
+						sanitize(error.message())
+				))
+				.toList();
 	}
 }

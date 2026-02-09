@@ -37,6 +37,7 @@ public class VotingSessionServiceImpl implements VotingSessionService {
 	@Override
 	@Transactional
 	public VotingSessionResponse create(final Long agendaId, final VotingSessionCreateRequest request) {
+		log.info("Creating voting Session -  agendaId={}", agendaId);
 		final Agenda agenda = getAgendaIfIdValid(agendaId);
 		final int durationMinutes = resolveDurationMinutes(request.durationMinutes());
 		final OffsetDateTime startsAt = OffsetDateTime.now(ZoneOffset.UTC);
@@ -70,16 +71,15 @@ public class VotingSessionServiceImpl implements VotingSessionService {
 	}
 
 	private int resolveDurationMinutes(final Integer durationMinutes) {
-		if (durationMinutes == null || durationMinutes < 1) {
+		if (durationMinutes == null || durationMinutes < VotingSessionProperties.MIN_DURATION_MINUTES) {
 			return properties.defaultDurationMinutes();
-		} else if (durationMinutes < properties.maxDurationMinutes()) {
-			return durationMinutes;
-		} else if (durationMinutes > properties.maxDurationMinutes()) {
+		}
+		if (durationMinutes > properties.maxDurationMinutes()) {
 			throw new ResponseStatusException(
 					HttpStatus.BAD_REQUEST,
 					"Duration must be at most " + properties.maxDurationMinutes() + " minutes"
 			);
 		}
-		return 0;
+		return durationMinutes;
 	}
 }

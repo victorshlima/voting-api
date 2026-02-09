@@ -12,14 +12,17 @@ import java.time.OffsetDateTime;
 @Table(name = "agenda")
 public class Agenda {
 
+	private static final int TITLE_MAX_LENGTH = 500;
+	private static final int RESULT_MAX_LENGTH = 500;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(name = "des_title", nullable = false, length = 500)
+	@Column(name = "des_title", nullable = false, length = TITLE_MAX_LENGTH)
 	private String title;
 
-	@Column(name = "result", length = 500)
+	@Column(name = "result", length = RESULT_MAX_LENGTH)
 	private String result;
 
 	@Column(name = "dat_create_result")

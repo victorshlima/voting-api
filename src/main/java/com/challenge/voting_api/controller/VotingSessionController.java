@@ -7,17 +7,18 @@ import com.challenge.voting_api.util.LocationUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.headers.Header;
-import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 @RestController
 @RequestMapping(path = "/voting-sessions/{agendaId}", headers = "X-API-Version=1")
@@ -48,28 +49,12 @@ public class VotingSessionController {
 					)
 			}
 	)
-	@ApiResponses({
-			@ApiResponse(
-					responseCode = "201",
-					description = "Sessao criada",
-					headers = {
-							@Header(name = "Location", description = "URI do recurso criado")
-					},
-					content = @Content(
-							mediaType = MediaType.APPLICATION_JSON_VALUE,
-							schema = @Schema(implementation = VotingSessionResponse.class)
-					)
-			),
-			@ApiResponse(responseCode = "400", description = "Dados invalidos"),
-			@ApiResponse(responseCode = "404", description = "Pauta nao encontrada"),
-			@ApiResponse(responseCode = "409", description = "Sessao ja existe para a pauta")
-	})
 	public ResponseEntity<VotingSessionResponse> create(
             final @Valid @RequestBody VotingSessionCreateRequest request,
-			@Parameter(description = "Identificador da pauta", example = "1")
+			@Parameter(description = "ID da pauta", example = "1")
 			@PathVariable final Long agendaId) {
 		VotingSessionResponse response = votingSessionService.create(agendaId, request);
 		URI location = LocationUtils.fromContextPathWithPath("/voting-sessions/{id}", response.sessionId());
-		return ResponseEntity.created(location).body(response);
+		return ResponseEntity.created(location).build();
 	}
 }

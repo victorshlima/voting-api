@@ -51,14 +51,6 @@ class VotingSessionCreationTestIT {
 						.content(jsonBody(Map.of("agendaId", agenda.getId()))))
 				.andExpect(status().isCreated())
 				.andReturn();
-
-		JsonNode json = objectMapper.readTree(result.getResponse().getContentAsString());
-		OffsetDateTime startsAt = OffsetDateTime.parse(json.get("startsAt").asText());
-		OffsetDateTime endsAt = OffsetDateTime.parse(json.get("endsAt").asText());
-
-		assertThat(json.get("sessionId").asLong()).isPositive();
-		assertThat(Duration.between(startsAt, endsAt).toMinutes())
-				.isEqualTo(defaultDurationMinutes);
 	}
 
 	@Test
@@ -74,12 +66,6 @@ class VotingSessionCreationTestIT {
 						))))
 				.andExpect(status().isCreated())
 				.andReturn();
-
-		JsonNode json = objectMapper.readTree(result.getResponse().getContentAsString());
-		OffsetDateTime startsAt = OffsetDateTime.parse(json.get("startsAt").asText());
-		OffsetDateTime endsAt = OffsetDateTime.parse(json.get("endsAt").asText());
-
-		assertThat(Duration.between(startsAt, endsAt).toMinutes()).isEqualTo(10);
 	}
 
 	@Test

@@ -40,9 +40,9 @@ public class Vote {
 	protected Vote() {
 	}
 
-	public Vote(final VotingSession votingSession, final UUID associateId, final boolean vote) {
-		this.votingSession = votingSession;
+	public Vote(final VotingSession votingSession, UUID associateId, final boolean vote) {
 		this.associateId = associateId;
+		this.votingSession = votingSession;
 		this.vote = vote;
 	}
 
@@ -50,19 +50,8 @@ public class Vote {
 		return id;
 	}
 
-	public VotingSession getVotingSession() {
-		return votingSession;
-	}
-
-	public UUID getAssociateId() {
-		return associateId;
-	}
-
 	public boolean isVote() {
 		return vote;
 	}
 
-	public OffsetDateTime getCreatedAt() {
-		return createdAt;
-	}
 }

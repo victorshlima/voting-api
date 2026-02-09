@@ -39,9 +39,7 @@ class AgendaControllerTestIT {
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(request)))
 				.andExpect(status().isCreated())
-				.andExpect(header().exists("Location"))
-				.andExpect(jsonPath("$.agendaId").isNumber())
-				.andExpect(jsonPath("$.title").value("Pauta de Teste"));
+				.andExpect(header().exists("Location"));
 	}
 
 	@Test

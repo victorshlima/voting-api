@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface VotingSessionRepository extends JpaRepository<VotingSession, Long> {
 
-	boolean existsByAgendaId(final Long agendaId);
+	boolean existsByAgendaId(Long agendaId);
 
 	@Query("""
 			select s from VotingSession s
