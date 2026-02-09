@@ -41,3 +41,7 @@ spring:
 voting-session:
   default-duration-minutes: 1
   max-duration-minutes: 60
+
+voting-result:
+  approval-threshold-percent: 50
+  scheduler-interval: 1m

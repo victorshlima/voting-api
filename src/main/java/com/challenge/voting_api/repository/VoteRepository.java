@@ -7,4 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface VoteRepository extends JpaRepository<Vote, Long> {
 
 	boolean existsByVotingSessionIdAndAssociateId(final Long votingSessionId, final UUID associateId);
+
+	long countByVotingSessionIdAndVoteTrue(final Long votingSessionId);
+
+	long countByVotingSessionIdAndVoteFalse(final Long votingSessionId);
 }
