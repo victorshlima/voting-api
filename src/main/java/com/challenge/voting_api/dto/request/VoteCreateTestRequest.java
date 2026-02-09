@@ -6,8 +6,8 @@ import jakarta.validation.constraints.NotNull;
 
 public record VoteCreateTestRequest(
 		@NotNull
-		@Schema(description = "Voto (SIM/NAO ou YES/NO)", example = "SIM",
-				allowableValues = {"SIM", "NAO", "YES", "NO"})
+		@Schema(description = "Voto (SIM/NAO)", example = "SIM",
+				allowableValues = {"SIM", "NAO"})
 		VoteChoice vote
 ) {
 }

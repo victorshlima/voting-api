@@ -4,11 +4,12 @@ server:
 spring:
   application:
     name: voting-api
-  lifecycle:
-    timeout-per-shutdown-phase: 30s
-  threads:
-    virtual:
+  docker:
+    compose:
       enabled: true
+      file: compose.yaml
+      lifecycle-management: start-and-stop
+    timeout-per-shutdown-phase: 30s
   datasource:
     url: jdbc:postgresql://localhost:5432/votingdb
     username: secret
@@ -67,4 +68,3 @@ logging:
     root: INFO
     com.zaxxer.hikari: INFO
     org.hibernate.SQL: WARN
-    org.hibernate.type.descriptor.sql: WARN

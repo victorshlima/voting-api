@@ -35,13 +35,7 @@ public enum VoteChoice {
 		if ("SIM".equals(normalized)) {
 			return SIM;
 		}
-		if ("YES".equals(normalized)) {
-			return SIM;
-		}
 		if ("NAO".equals(normalized)) {
-			return NAO;
-		}
-		if ("NO".equals(normalized)) {
 			return NAO;
 		}
 		throw new IllegalArgumentException("Invalid vote value: " + value);
