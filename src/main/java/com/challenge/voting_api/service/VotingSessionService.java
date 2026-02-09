@@ -5,5 +5,5 @@ import com.challenge.voting_api.dto.response.VotingSessionResponse;
 
 public interface VotingSessionService {
 
-	VotingSessionResponse create(final Long votingSessionId, final VotingSessionCreateRequest request);
+	VotingSessionResponse create(final Long agendaId, final VotingSessionCreateRequest request);
 }

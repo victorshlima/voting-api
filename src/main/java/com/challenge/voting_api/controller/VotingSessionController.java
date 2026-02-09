@@ -20,7 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(path = "/voting-sessions/{votingSessionId}", headers = "X-API-Version=1")
+@RequestMapping(path = "/voting-sessions/{agendaId}", headers = "X-API-Version=1")
 @Tag(name = "Voting Sessions", description = "Operacoes para gerenciar sessoes de votacao")
 public class VotingSessionController {
 
@@ -66,9 +66,10 @@ public class VotingSessionController {
 	})
 	public ResponseEntity<VotingSessionResponse> create(
             final @Valid @RequestBody VotingSessionCreateRequest request,
-			@PathVariable final Long votingSessionId) {
-		VotingSessionResponse response = votingSessionService.create(votingSessionId, request);
-		URI location = LocationUtils.fromCurrentRequestWithId(response.sessionId());
+			@Parameter(description = "Identificador da pauta", example = "1")
+			@PathVariable final Long agendaId) {
+		VotingSessionResponse response = votingSessionService.create(agendaId, request);
+		URI location = LocationUtils.fromContextPathWithPath("/voting-sessions/{id}", response.sessionId());
 		return ResponseEntity.created(location).body(response);
 	}
 }

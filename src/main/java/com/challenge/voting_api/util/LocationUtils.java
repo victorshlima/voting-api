@@ -14,4 +14,11 @@ public final class LocationUtils {
 				.buildAndExpand(id)
 				.toUri();
 	}
+
+	public static URI fromContextPathWithPath(final String path, final Object id) {
+		return ServletUriComponentsBuilder.fromCurrentContextPath()
+				.path(path)
+				.buildAndExpand(id)
+				.toUri();
+	}
 }

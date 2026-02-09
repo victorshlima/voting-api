@@ -1,6 +1,7 @@
 package com.challenge.voting_api.controller;
 
 import com.challenge.voting_api.dto.request.VoteCreateRequest;
+import com.challenge.voting_api.dto.request.VoteCreateTestRequest;
 import com.challenge.voting_api.dto.response.VoteResponse;
 import com.challenge.voting_api.service.VoteService;
 import com.challenge.voting_api.util.LocationUtils;
@@ -15,6 +16,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
+import java.util.UUID;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -74,6 +76,54 @@ public class VoteController {
 	) {
 		VoteResponse response = voteService.create(votingSessionId, request);
 		URI location = LocationUtils.fromCurrentRequestWithId(response.id());
+		return ResponseEntity.created(location).body(response);
+	}
+
+	@PostMapping(path = "/test", consumes = MediaType.APPLICATION_JSON_VALUE,
+			produces = MediaType.APPLICATION_JSON_VALUE)
+	@Operation(
+			summary = "Registrar voto (UUID gerado)",
+			description = "Registra voto com UUID gerado automaticamente para testes.",
+			parameters = {
+					@Parameter(
+							name = "X-API-Version",
+							in = ParameterIn.HEADER,
+							required = true,
+							description = "Versao da API",
+							schema = @Schema(type = "string"),
+							example = "1"
+					)
+			}
+	)
+	@ApiResponses({
+			@ApiResponse(
+					responseCode = "201",
+					description = "Voto registrado",
+					headers = {
+							@Header(name = "Location", description = "URI do recurso criado")
+					},
+					content = @Content(
+							mediaType = MediaType.APPLICATION_JSON_VALUE,
+							schema = @Schema(implementation = VoteResponse.class)
+					)
+			),
+			@ApiResponse(responseCode = "400", description = "Dados invalidos"),
+			@ApiResponse(responseCode = "404", description = "Sessao nao encontrada"),
+			@ApiResponse(responseCode = "409", description = "Sessao encerrada ou voto duplicado")
+	})
+	public ResponseEntity<VoteResponse> createWithGeneratedAssociateId(
+			@Parameter(description = "Identificador da sessao de votacao", example = "1")
+			@PathVariable final Long votingSessionId,
+			final @Valid @RequestBody VoteCreateTestRequest request
+	) {
+		VoteResponse response = voteService.create(
+				votingSessionId,
+				new VoteCreateRequest(UUID.randomUUID(), request.vote())
+		);
+		URI location = LocationUtils.fromContextPathWithPath(
+				"/voting-sessions/" + votingSessionId + "/votes/{id}",
+				response.id()
+		);
 		return ResponseEntity.created(location).body(response);
 	}
 }

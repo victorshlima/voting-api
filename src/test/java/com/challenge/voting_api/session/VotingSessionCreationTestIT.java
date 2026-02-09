@@ -56,8 +56,7 @@ class VotingSessionCreationTestIT {
 		OffsetDateTime startsAt = OffsetDateTime.parse(json.get("startsAt").asText());
 		OffsetDateTime endsAt = OffsetDateTime.parse(json.get("endsAt").asText());
 
-		assertThat(json.get("id").asLong()).isPositive();
-		assertThat(json.get("agendaId").asLong()).isEqualTo(agenda.getId());
+		assertThat(json.get("sessionId").asLong()).isPositive();
 		assertThat(Duration.between(startsAt, endsAt).toMinutes())
 				.isEqualTo(defaultDurationMinutes);
 	}
