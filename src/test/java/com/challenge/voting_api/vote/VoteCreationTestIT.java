@@ -90,15 +90,22 @@ class VoteCreationTestIT {
 	void shouldReturnConflictWhenVoteIsDuplicated() throws Exception {
 		OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
 		VotingSession session = createVotingSession(now.minusMinutes(1), now.plusMinutes(5));
+		UUID associateId = UUID.randomUUID();
+		String payload = jsonBody(Map.of(
+				"associateId", associateId,
+				"vote", "SIM"
+		));
 
 		mockMvc.perform(post("/voting-sessions/{votingSessionId}/votes", session.getId())
 						.header(API_VERSION_HEADER, "1")
-						.contentType(MediaType.APPLICATION_JSON))
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(payload))
 				.andExpect(status().isCreated());
 
 		mockMvc.perform(post("/voting-sessions/{votingSessionId}/votes", session.getId())
 						.header(API_VERSION_HEADER, "1")
-						.contentType(MediaType.APPLICATION_JSON))
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(payload))
 				.andExpect(status().isConflict());
 	}
 
